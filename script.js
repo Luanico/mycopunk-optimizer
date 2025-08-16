@@ -2,7 +2,7 @@ import {canvas, ctx, colorGrid, Grid, hexagons, hexRadius, GridToShape, AllShape
 import { buildGrid, redrawGrid, SKey, loadShapes, place_shapes} from "./functions.js";
 
 
-export const debugging = true
+export let debugging = false
 
 /* --------------------------------------------
                   MAIN PART
@@ -29,20 +29,20 @@ button.addEventListener('click', () => {
         return `hsl(${hue}, 100%, 50%)`;
       });
     console.log(names.map(name => AllShapes.get(name)))
-    place_shapes(names.map(name => AllShapes.get(name)), colors, names, true).then(() =>{
+    place_shapes(names.map(name => AllShapes.get(name)), colors, names, debugging).then(() =>{
         redrawGrid()
         console.log("Done!")
     })
 })
 
 
-const coordsDiv = document.createElement('div');
-coordsDiv.style.position = 'absolute';
-coordsDiv.style.background = 'white';
-coordsDiv.style.padding = '4px';
-coordsDiv.style.border = '1px solid black';
-coordsDiv.style.display = 'none';
-document.body.appendChild(coordsDiv);
+const nameDiv = document.createElement('div');
+nameDiv.style.position = 'absolute';
+nameDiv.style.background = 'white';
+nameDiv.style.padding = '4px';
+nameDiv.style.border = '1px solid black';
+nameDiv.style.display = 'none';
+document.body.appendChild(nameDiv);
 
 canvas.addEventListener('mousemove', e => {
     const rect = canvas.getBoundingClientRect();
@@ -66,15 +66,15 @@ canvas.addEventListener('mousemove', e => {
     if (found) {
         let key = SKey(found.row, found.col)
         if (GridToShape.get(key) != ""){
-            coordsDiv.textContent = GridToShape.get(key);
-            coordsDiv.style.left = e.pageX + 10 + 'px';
-            coordsDiv.style.top = e.pageY + 10 + 'px';
-            coordsDiv.style.display = 'block';
+            nameDiv.textContent = GridToShape.get(key);
+            nameDiv.style.left = e.pageX + 10 + 'px';
+            nameDiv.style.top = e.pageY + 10 + 'px';
+            nameDiv.style.display = 'block';
         } else {
-            coordsDiv.style.display = 'none';
+            nameDiv.style.display = 'none';
         }
     } else {
-        coordsDiv.style.display = 'none';
+        nameDiv.style.display = 'none';
     }
 });
 
@@ -82,9 +82,31 @@ canvas.addEventListener('mousemove', e => {
 /* --------------------------------------------
                    Debugging
 ---------------------------------------------*/
-if (debugging){
+
+document.addEventListener("keydown", (event) => {
+    if (event.shiftKey && event.key === "D") {
+        if (debugging){
+            console.log("Debug mode deactivated");
+            debugging = false
+            document.getElementById("debugText").style.visibility = "hidden";
+            debug__removeCoord()
+        }
+        else{
+            console.log("Debug mode activated");
+            debugging = true
+            document.getElementById("debugText").style.visibility = "visible";
+            debug__addCoord()
+        }
+    }
+    
+});
+
+let mouseMoveHandler;
+let coordsDiv;
+
+function debug__addCoord(){
     // Display element for coordinates
-    const coordsDiv = document.createElement('div');
+    coordsDiv = document.createElement('div');
     coordsDiv.style.position = 'absolute';
     coordsDiv.style.background = 'white';
     coordsDiv.style.padding = '4px';
@@ -92,23 +114,19 @@ if (debugging){
     coordsDiv.style.display = 'none';
     document.body.appendChild(coordsDiv);
 
-    canvas.addEventListener('mousemove', e => {
+    
+    mouseMoveHandler = e => {
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
         let found = null;
 
-        // Check if mouse is inside a hex
         hexagons.forEach(hex => {
             const dx = mouseX - hex.x;
             const dy = mouseY - hex.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            // Quick circle radius check (less precise but fast)
-            if (dist <= hexRadius) {
-                found = hex;
-            }
+            if (dist <= hexRadius) found = hex;
         });
 
         if (found) {
@@ -119,5 +137,18 @@ if (debugging){
         } else {
             coordsDiv.style.display = 'none';
         }
-    });
+    };
+
+    canvas.addEventListener('mousemove', mouseMoveHandler);
+}
+
+function debug__removeCoord() {
+    if (mouseMoveHandler) {
+        canvas.removeEventListener('mousemove', mouseMoveHandler);
+        mouseMoveHandler = null;
+    }
+    if (coordsDiv) {
+        coordsDiv.remove();
+        coordsDiv = null;
+    }
 }
