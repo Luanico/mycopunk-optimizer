@@ -1,4 +1,4 @@
-import {canvas, ctx, colorGrid, Grid, hexagons, hexRadius, GridToShape, AllShapes, rotateShapeAroundCenter} from "./functions.js"
+import {canvas, ctx, colorGrid, Grid, hexagons, hexRadius, GridToShape, AllShapes, rotateShapeAroundCenter, load_shape} from "./functions.js"
 import { buildGrid, redrawGrid, SKey, loadShapes, place_shapes} from "./functions.js";
 
 
@@ -76,6 +76,44 @@ canvas.addEventListener('mousemove', e => {
     } else {
         nameDiv.style.display = 'none';
     }
+});
+
+
+document.getElementById("uploadShapes").addEventListener("click", () => {
+    console.log("test")
+    document.getElementById("folderInput").click();
+});
+
+document.getElementById("customSelectionButton").addEventListener("click", () => {
+    document.getElementById('customSelectionDialog').showModal();
+})
+
+// Handle folder selection
+document.getElementById("folderInput").addEventListener("change", async (event) => {
+    const files = event.target.files;
+    AllShapes.clear()
+    for (const file of files) {
+        const relativePath = file.webkitRelativePath;
+        const name = relativePath.split("/").at(-1);
+
+        // Read file content
+        const content = await file.text();
+
+
+        const lines = content.split(/\r?\n/).filter(line => line.length > 0)
+        let shape = lines.map(s => {
+            let pos = s.split(',')
+            return([parseInt(pos[0]), parseInt(pos[1])])
+        })
+
+        if (AllShapes.has(name)) {
+            console.error(`Shape "${name}" already loaded!`);
+        } else {
+            AllShapes.set(name, shape);
+        }
+    }
+
+    console.log("All loaded shapes:", AllShapes);
 });
 
 

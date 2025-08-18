@@ -1,3 +1,6 @@
+import JSZip from "https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm";
+import saveAs from "https://cdn.jsdelivr.net/npm/file-saver@2.0.5/+esm";
+
 /* --------------------------------------------
         Global constants and variables
 ---------------------------------------------*/
@@ -330,3 +333,44 @@ export function showShapes(category) {
     });
 }
 
+
+
+/* --------------------------------------------
+               File manipulation
+---------------------------------------------*/
+
+export function downloadCustomShape(filename, shape) {
+    const lines = shape.map(([q, r]) => `${q},${r}`);
+    const content = lines.join("\n") + "\n";
+
+    // a blob represents the file in memory
+    const blob = new Blob([content], { type: 'text/plain' });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+export function downloadShapesZip(shapesByCategory) {
+    const zip = new JSZip();
+
+    // shapesByCategory = { "animals": [shape1, shape2], "vehicles": [shape3] }
+    for (const [category, shapes] of Object.entries(categoriesMap)) {
+        const folder = zip.folder(category);
+        shapes.forEach((name, i) => {
+            const shape = AllShapes.get(name)
+            const content = shape.map(([q, r]) => `${q},${r}`).join("\n") + "\n";
+            folder.file(`${name}`, content);
+        });
+    }
+
+    // Generate the ZIP and trigger download
+    zip.generateAsync({ type: "blob" }).then(content => {
+        saveAs(content, "shapes.zip");
+    });
+}

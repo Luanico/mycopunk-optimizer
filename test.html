@@ -8,13 +8,24 @@
       display: block;
       margin: 0 auto;
     }
+    #customSelectionDialog {
+      width: 80%;
+      height: 80%;
+      border: 2px solid black;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+    }
+    #customSelectionDialog::backdrop {
+      background: rgba(0,0,0,0.5);
+    }
   </style>
 </head>
 <body>
   <h2 style="text-align:center;">Hex Grid</h2>
-  <button onclick="location.href='shapemaker.html'">Shape Maker</button>
   <button id="nextStepButton">Next Step</button>
   <p id="debugText" style="visibility: hidden;">Debug mode (Shift+D to deactivate)</p>
+  <button id="customSelectionButton">Need Custom Shapes?</button>
   <canvas id="hexCanvas" width="800" height="600"></canvas>
   <script src="script.js" type="module" defer></script>
   <label>Rows: <input id="rowsInput" type="number" value="7" min="1"></label>
@@ -25,5 +36,13 @@
   
   <ul id="shapeList"></ul>
   <button id="testButton" style="width: 100%; max-width: 300px;"> Test </button>
+
+  <dialog id="customSelectionDialog">
+    <p>Hello from the dialog!</p>
+    <button onclick="location.href='shapemaker.html'">Shape Maker</button>
+    <input type="file" id="folderInput" webkitdirectory multiple style="display:none">
+    <button id="uploadShapes">Upload Shapes Folder</button>
+    <button onclick="document.getElementById('customSelectionDialog').close()">Close</button>
+  </dialog>
 </body>
 </html>

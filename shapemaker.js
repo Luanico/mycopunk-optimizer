@@ -1,4 +1,5 @@
-import { buildGrid, redrawGrid, SKey, colorGrid, Grid, hexagons, hexRadius, gray, parseKey } from "./functions.js";
+import { buildGrid, redrawGrid, SKey, parseKey, downloadCustomShape } from "./functions.js";
+import {colorGrid, Grid, hexagons, hexRadius, gray} from "./functions.js";
 
 const debugging = true
 
@@ -40,17 +41,6 @@ canvas.addEventListener('click', e => {
     }
 });
 
-async function saveFile() {
-    const dirHandle = await window.showDirectoryPicker();
-
-    const fileHandle = await dirHandle.getFileHandle("example.txt", { create: true });
-    const writable = await fileHandle.createWritable();
-
-    await writable.write("Hello from JavaScript!");
-    await writable.close();
-
-    console.log("File saved!");
-}
 
 function normalizeShape(shape) {
     let minCol = Infinity;
@@ -96,7 +86,7 @@ button.addEventListener('click', () => {
     shape = normalizeShape(shape)
 
     console.log(shape);
-
+    downloadCustomShape(name, shape)
 })
 
 
