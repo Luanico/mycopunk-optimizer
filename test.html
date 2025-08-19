@@ -19,6 +19,18 @@
     #customSelectionDialog::backdrop {
       background: rgba(0,0,0,0.5);
     }
+    #closeDialogBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+    }
+    #closeDialogBtn:hover {
+    color: red;
+    }
   </style>
 </head>
 <body>
@@ -35,14 +47,25 @@
   </select>
   
   <ul id="shapeList"></ul>
-  <button id="testButton" style="width: 100%; max-width: 300px;"> Test </button>
+  <button id="placeShapesButton" style="width: 100%; max-width: 300px;"> Place shapes </button>
 
   <dialog id="customSelectionDialog">
-    <p>Hello from the dialog!</p>
+    <h1>Need Custom Shapes?</h1>
+    <p>
+      Since i didn't unlock every upgrade yet, and they also sometimes change shape in updates, you might not find the upgrade you want.
+       That's why i added a shape maker that you can use
+    </p>
+    <h2>How it works:</h2>
+    <p>
+      The program works by having a folder with all the shapes, sorted in their different weapons/characters.
+      You can download the base folder, then go the the shapemaker, create the upgrades you need, and save them in the right folder.
+      Once you have all your shapes added, you can load your custom folder instead of the default one on this page.
+    </p>
     <button onclick="location.href='shapemaker.html'">Shape Maker</button>
     <input type="file" id="folderInput" webkitdirectory multiple style="display:none">
     <button id="uploadShapes">Upload Shapes Folder</button>
-    <button onclick="document.getElementById('customSelectionDialog').close()">Close</button>
+    <button id="downloadShapes">Download Server Shapes Folder</button>
+    <button id="closeDialogBtn" onclick="document.getElementById('customSelectionDialog').close()">Close</button>
   </dialog>
 </body>
 </html>

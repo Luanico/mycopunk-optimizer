@@ -32,17 +32,6 @@ export function SKey(x,y){
     return (`${x},${y}`)
 }
 
-export async function GetLines(filepath){
-    try {
-        const response = await fetch(filepath);
-        const text = await response.text();
-        const lines = text.split(/\r?\n/);
-        return lines.filter(line => line.length > 0)
-      } catch (error) {
-        console.error('Error loading file:', error);
-      }
-}
-
 export function parseKey(s){
     return(s.split(',').map(c => {
         return parseInt(c)
@@ -70,38 +59,6 @@ export function neighbors(r, c){
     return res.filter(([x, y]) =>
         x >= 0 && y >= 0 && x < size[0] && y < size[1]
     );
-}
-
-export async function load_shape(filepath){ 
-    const lines = await GetLines(filepath)
-    let shape = lines.map(s => {
-        let pos = s.split(',')
-        return([parseInt(pos[0]), parseInt(pos[1])])
-    })
-    return shape
-}
-
-export function loadShapes(){
-    fetch('filelist.json')
-    .then(res => res.json())
-    .then(res => {
-        categories = Object.keys(res)
-        for (const [key, value] of Object.entries(res)) {
-            categoriesMap.set(key, value)
-        }          
-        return Object.entries(res).flatMap(([key, list]) => list.map(str => "shapes/" + key + '/' + str))
-    })
-    .then(files => {
-        files.forEach(file => load_shape(file).then(shape => {
-            let name = file.split('/').at(-1)
-            if (AllShapes.has(name)){
-                console.error("loadShapes: Multiple times the same name!!!")
-                return
-            }
-            AllShapes.set(name, shape)
-        }))
-    })
-    .then(() => loadIndex())
 }
 
 //rotations
@@ -342,30 +299,31 @@ export function showShapes(category) {
 export function downloadCustomShape(filename, shape) {
     const lines = shape.map(([q, r]) => `${q},${r}`);
     const content = lines.join("\n") + "\n";
-
+    
     // a blob represents the file in memory
-    const blob = new Blob([content], { type: 'text/plain' });
-
+    const blob = new Blob([content]);
+    
     const url = URL.createObjectURL(blob);
-
+    
     const a = document.createElement('a');
     a.href = url;
-    a.download = filename;
+
+    a.download = filename + ".shape";
     a.click();
 
     URL.revokeObjectURL(url);
 }
 
-export function downloadShapesZip(shapesByCategory) {
+export function downloadShapesZip() {
     const zip = new JSZip();
-
-    // shapesByCategory = { "animals": [shape1, shape2], "vehicles": [shape3] }
-    for (const [category, shapes] of Object.entries(categoriesMap)) {
-        const folder = zip.folder(category);
+    const shapesFolder = zip.folder("shapes");
+    
+    for (const [category, shapes] of categoriesMap.entries()) {
+        const folder = shapesFolder.folder(category);
         shapes.forEach((name, i) => {
             const shape = AllShapes.get(name)
             const content = shape.map(([q, r]) => `${q},${r}`).join("\n") + "\n";
-            folder.file(`${name}`, content);
+            folder.file(`${name}.shape`, content);
         });
     }
 
@@ -373,4 +331,54 @@ export function downloadShapesZip(shapesByCategory) {
     zip.generateAsync({ type: "blob" }).then(content => {
         saveAs(content, "shapes.zip");
     });
+}
+
+
+export async function GetLines(filepath){
+    try {
+        const response = await fetch(filepath);
+        const text = await response.text();
+        const lines = text.split(/\r?\n/);
+        return lines.filter(line => line.length > 0)
+      } catch (error) {
+        console.error('Error loading file:', error);
+      }
+}
+
+export async function load_shape(filepath){ 
+    const lines = await GetLines(filepath)
+    let shape = lines.map(s => {
+        let pos = s.split(',')
+        return([parseInt(pos[0]), parseInt(pos[1])])
+    })
+    return shape
+}
+
+export function loadShapes(){
+    fetch('filelist.json')
+    .then(res => res.json())
+    .then(res => {
+        categories = Object.keys(res)
+        for (let [key, value] of Object.entries(res)) {
+            value = value.filter((s => {
+                return (s.slice(-6) == ".shape")
+            })).map(s => s.slice(0, -6))
+            categoriesMap.set(key, value)
+        }          
+        return Object.entries(res).flatMap(([key, list]) => list.filter((s => {
+            return (s.slice(-6) == ".shape")
+        })).map(str => "shapes/" + key + '/' + str))
+    })
+    .then(files => {
+        files.forEach(file => load_shape(file).then(shape => {
+            let name = file.slice(0, -6).split('/').at(-1)
+            if (AllShapes.has(name)){
+                console.error("loadShapes: Multiple times the same name!!!")
+                return
+            }
+            AllShapes.set(name, shape)
+        }))
+    })
+    .then(() => loadIndex())
+    console.log(AllShapes)
 }

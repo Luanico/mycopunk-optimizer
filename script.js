@@ -1,5 +1,5 @@
-import {canvas, ctx, colorGrid, Grid, hexagons, hexRadius, GridToShape, AllShapes, rotateShapeAroundCenter, load_shape} from "./functions.js"
-import { buildGrid, redrawGrid, SKey, loadShapes, place_shapes} from "./functions.js";
+import {canvas, ctx, colorGrid, Grid, hexagons, hexRadius, GridToShape, AllShapes, rotateShapeAroundCenter, load_shape, categoriesMap} from "./functions.js"
+import { buildGrid, redrawGrid, SKey, loadShapes, place_shapes, downloadShapesZip} from "./functions.js";
 
 
 export let debugging = false
@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
 buildGrid();
 
 
-const button = document.getElementById("testButton")
+const button = document.getElementById("placeShapesButton")
 button.addEventListener('click', () => {
     buildGrid()
     const checkedBoxes = document.querySelectorAll('#shapeList input[type="checkbox"]:checked');
@@ -80,9 +80,15 @@ canvas.addEventListener('mousemove', e => {
 
 
 document.getElementById("uploadShapes").addEventListener("click", () => {
-    console.log("test")
     document.getElementById("folderInput").click();
 });
+
+
+document.getElementById("downloadShapes").addEventListener("click", () => {
+    downloadShapesZip()
+});
+
+
 
 document.getElementById("customSelectionButton").addEventListener("click", () => {
     document.getElementById('customSelectionDialog').showModal();

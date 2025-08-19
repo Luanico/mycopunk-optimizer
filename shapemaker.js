@@ -59,8 +59,8 @@ const form = document.getElementById('shape_name')
 const button = document.getElementById('add_shape')
 
 button.addEventListener('click', () => {
-    const name = form.ariaValueMax
-    if (form.value === ""){
+    const name = form.value
+    if (name === ""){
         console.error("Shapemaker: No name given")
         return
     }
@@ -84,7 +84,6 @@ button.addEventListener('click', () => {
     });
 
     shape = normalizeShape(shape)
-
     console.log(shape);
     downloadCustomShape(name, shape)
 })
