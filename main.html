@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hex Grid</title>
+  <style>
+    canvas {
+      border: 1px solid #ccc;
+      display: block;
+      margin: 0 auto;
+    }
+    #customSelectionDialog {
+      width: 80%;
+      height: 80%;
+      border: 2px solid black;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+    }
+    #customSelectionDialog::backdrop {
+      background: rgba(0,0,0,0.5);
+    }
+    #closeDialogBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+    }
+    #closeDialogBtn:hover {
+    color: red;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">Hex Grid</h2>
+  <button id="nextStepButton">Next Step</button>
+  <p id="debugText" style="visibility: hidden;">Debug mode (Shift+D to deactivate)</p>
+  <button id="customSelectionButton">Need Custom Shapes?</button>
+  <canvas id="hexCanvas" width="800" height="600"></canvas>
+  <script src="script.js" type="module" defer></script>
+  <label>Rows: <input id="rowsInput" type="number" value="7" min="1"></label>
+  <label>Cols: <input id="colsInput" type="number" value="7" min="1"></label>
+  <select id="categorySelect">
+    <option value="">Select a category</option>
+  </select>
+  
+  <ul id="shapeList"></ul>
+  <button id="placeShapesButton" style="width: 100%; max-width: 300px;"> Place shapes </button>
+
+  <dialog id="customSelectionDialog">
+    <h1>Need Custom Shapes?</h1>
+    <p>
+      Since i didn't unlock every upgrade yet, and they also sometimes change shape in updates, you might not find the upgrade you want.
+       That's why i added a shape maker that you can use
+    </p>
+    <h2>How it works:</h2>
+    <p>
+      The program works by having a folder with all the shapes, sorted in their different weapons/characters.
+      You can download the base folder, then go the the shapemaker, create the upgrades you need, and save them in the right folder.
+      Once you have all your shapes added, you can load your custom folder instead of the default one on this page.
+    </p>
+    <button onclick="location.href='shapemaker.html'">Shape Maker</button>
+    <input type="file" id="folderInput" webkitdirectory multiple style="display:none">
+    <button id="uploadShapes">Upload Shapes Folder</button>
+    <button id="downloadShapes">Download Server Shapes Folder</button>
+    <button id="closeDialogBtn" onclick="document.getElementById('customSelectionDialog').close()">Close</button>
+  </dialog>
+</body>
+</html>
